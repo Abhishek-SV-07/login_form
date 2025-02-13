@@ -1,32 +1,24 @@
-const express = require("express");
-const cors = require("cors");
-const bodyParser = require("body-parser");
-const fs = require("fs");
+document.getElementById("loginForm").addEventListener("submit", async function(event) {
+    event.preventDefault(); // Prevent page reload
 
-const app = express();
-const PORT = 5000;
+    const username = document.getElementById("username").value;
+    const password = document.getElementById("password").value;
 
-app.use(cors());
-app.use(bodyParser.json());
+    const response = await fetch("http://localhost:5000/login", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ username, password })
+    });
 
-// Read user credentials from users.json
-const users = JSON.parse(fs.readFileSync("users.json", "utf-8"));
+    const result = await response.json();
+    if (result.success) {
+        console.log("Login successful!");
+        window.location.href = "loggedin.html"; // Redirect to logged-in page
 
-// Login Route
-app.post("/login", (req, res) => {
-    const { username, password } = req.body;
-    
-    // Check if user exists
-    const user = users.find(user => user.username === username && user.password === password);
-    
-    if (user) {
-        res.json({ success: true });
     } else {
-        res.json({ success: false });
+        console.log("Login failed!");
+        alert("Invalid credentials! Please try again.");
     }
-});
-
-// Start the server
-app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
 });
